@@ -145,12 +145,32 @@ public class ClientProxy extends CommonProxy {
     }
 
     public static void resetCursorIcon() {
-        if (resizeCursorV == null) return; // cursors failed to initialized
-        try {
-            if (currentCursor == resizeCursorDiag || currentCursor == resizeCursorDiagInverse || currentCursor == resizeCursorH || currentCursor == resizeCursorV) {
+    if (resizeCursorV == null) return;
+    
+    if (!Mouse.isCreated()) {
+        return;
+    }
+    
+    if (!Minecraft.getMinecraft().isCallingFromMinecraftThread()) {
+        return;
+    }
+    
+    if (!Display.isActive()) {
+        return;
+    }
+    
+    try {
+        if (currentCursor == resizeCursorDiag || currentCursor == resizeCursorDiagInverse || 
+            currentCursor == resizeCursorH || currentCursor == resizeCursorV) {
+            
+            Cursor currentSystemCursor = Mouse.getNativeCursor();
+            
+            if (currentSystemCursor == null) {
                 currentCursor = null;
+                return;
             }
-            Mouse.setNativeCursor(currentCursor);
+            
+            Mouse.setNativeCursor(null);
             currentCursor = null;
         } catch (LWJGLException e) {
             throw new RuntimeException(e);
